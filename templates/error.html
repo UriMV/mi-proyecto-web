@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/acerca">Acerca</a></li>
+            <li><a href="/contacto">Contacto</a></li>
+        </ul>
+    </nav>
+
+    <div class="breadcrumbs">
+        {{ range .breadcrumb }}
+            <span>{{ . }}</span>
+        {{ end }}
+    </div>
+
+    <h1>Error {{ .status }}</h1>
+    <p>{{ .message }}</p>
+
+    <a href="/">Volver al inicio</a>
+</body>
+</html>
