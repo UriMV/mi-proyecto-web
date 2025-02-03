@@ -8,25 +8,42 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Función personalizada para restar valores en el template
-func sub(a, b int) int {
-	return a - b
-}
+// Credenciales en memoria
+var validUser = "admin"
+var validPass = "1234"
 
 func main() {
 	r := gin.Default()
 
-	// Registrar funciones personalizadas en los templates
-	tmpl := template.Must(template.New("").Funcs(template.FuncMap{
-		"sub": sub,
-	}).ParseGlob("templates/*"))
-
+	// Cargar templates
+	tmpl := template.Must(template.New("").ParseGlob("templates/*"))
 	r.SetHTMLTemplate(tmpl)
 
-	// Cargar archivos estáticos
+	// Archivos estáticos
 	r.Static("/static", "./static")
 
-	// Rutas principales con breadcrumbs
+	// Página de login
+	r.GET("/login", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "login.html", nil)
+	})
+
+	// Manejo del login
+	r.POST("/login", func(c *gin.Context) {
+		username := c.PostForm("username")
+		password := c.PostForm("password")
+
+		if username == validUser && password == validPass {
+			// Redirigir a la página de inicio tras el login exitoso
+			c.Redirect(http.StatusSeeOther, "/")
+		} else {
+			// Mostrar mensaje de error
+			c.HTML(http.StatusUnauthorized, "login.html", gin.H{
+				"error": "Usuario o contraseña incorrectos",
+			})
+		}
+	})
+
+	// Ruta principal
 	r.GET("/", func(c *gin.Context) {
 		fmt.Println("Cargando página de inicio...")
 		c.HTML(http.StatusOK, "index.html", gin.H{
@@ -35,36 +52,6 @@ func main() {
 		})
 	})
 
-	r.GET("/acerca", func(c *gin.Context) {
-		fmt.Println("Cargando página Acerca de...")
-		c.HTML(http.StatusOK, "index.html", gin.H{
-			"title":      "Acerca de",
-			"breadcrumb": []string{"Inicio", "Acerca de"},
-		})
-	})
-
-	r.GET("/contacto", func(c *gin.Context) {
-		fmt.Println("Cargando página de Contacto...")
-		c.HTML(http.StatusOK, "index.html", gin.H{
-			"title":      "Contacto",
-			"breadcrumb": []string{"Inicio", "Contacto"},
-		})
-	})
-
-	r.NoRoute(func(c *gin.Context) {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{
-			"status":     404,
-			"message":    "Página no encontrada",
-			"breadcrumb": []string{"Inicio", "Error 404"},
-		})
-	})
-
-	// Ruta para simular un error interno
-	r.GET("/error500", func(c *gin.Context) {
-		panic("Error interno simulado") // Forzar un error 500
-	})
-	
-
-	// Iniciar servidor en el puerto 8080
+	// Iniciar servidor
 	r.Run(":8080")
 }
