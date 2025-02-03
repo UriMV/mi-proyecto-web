@@ -38,6 +38,8 @@ nav ul li a {
     cursor: pointer;
 }
 
+
+
 /* Estilos para pantallas pequeñas */
 @media (max-width: 768px) {
     #menu {
